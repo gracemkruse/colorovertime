@@ -1,0 +1,132 @@
+int cx, cy;
+float secondsRadius;
+float minutesRadius;
+float hoursRadius;
+float clockDiameter;
+float recHeight;
+float recWidth;
+int Y_AXIS = 1;
+color c1, c2;
+
+
+void setup() {
+
+  recHeight = 800;
+  recWidth = 800;
+
+  fullScreen();
+  stroke(255);
+  // Warning, may come with performance hit on low-end devices
+  smooth(4);
+}
+
+
+void draw() {
+  //0-14
+  if (second() >= 0  && (second() < 15)) {
+    c1= color ( (((19/5) * second())+34), (((6) * second()) + 63), (((101/15)  * second()) + 119) );
+    //c2= color (0,0,0);
+    c2 = color ( (((172/15) * second())+67), (((88/15) * second())+55), (((-1/5) *second()) +113) );
+    //println("quadrant 0-14");
+    //println(second());
+  }
+
+  //15-29
+  if (second() >= 15  & second() < 30) {
+    c1= color ( (((74/15) * second()) + 17), (((14/3) * second())+83), (((2/5) * second ()) + 214) );
+    c2 = color( (((13/15) *second())+226), (((109/15) * second()) + 34), (((8) * second()) -10) );
+    //println("quadrant 15-29");
+    //println(second());
+  }
+  //30-44 
+  if (second() >= 30  & second() < 45) {
+    c1= color ( (((6) * second()) - 15), (((-14/15) * second()) + 253), (((-98/15) * second()) + 422) );
+    c2 = color( (((-4/3) * second())+292), (((-38/3) * second()) +632), (((-9) * second()) +500));
+    //println("quadrant 30-44");
+    //println(second());
+  }
+  //45-59
+  if (second() >= 45  & second() < 60) {
+    c1= color ( (((-221/15) *second())+ 918), (((-146/15) * second()) + 647), (((-3/5) * second()) + 155) );
+    c2 = color( ((-11 * second()) + 727), (((-7/15) * second()) - 83), (((6/5) * second()) +41) );
+    //println("quadrant 45-59");
+    //println(second());
+  }
+
+  //float s = map(millis(), 0, 60*1000, 0, TWO_PI);
+  float s = map(second(), 0, 60, 0, TWO_PI);
+  background(0);
+  //background((255 * ((1 + cos(value))/2)) + HALF_PI);
+  noFill();
+  //rectMode(CENTER);
+  //rect(width/2, height/2, recWidth, recHeight);
+  //fill(255);
+
+
+  translate(width/2, height/2);
+  rectMode(CENTER);
+  rotate(s);
+
+  // Number of bars per side
+  int count = 3;
+  int center = 0;
+  // Pixels between center of bars
+  int spacing = 150;
+  // How many pixels across a bar is.
+  int bar_thickness = 75;
+  // Create center bar
+  setGradient(center, -recHeight, bar_thickness, 2*recHeight, c1, c2, Y_AXIS);
+  for (int it=0; it<count; it++) {
+    // Pseudo-code
+    // Let inner_c1, inner_c2 = getColor(second(), it)
+    // setGradient(...,inner_c1, inner_c2,...)
+    // Create right bar
+    setGradient(center + spacing*(it+1), -recHeight, bar_thickness, 2*recHeight, c1, c2, Y_AXIS);
+    // Create left bar
+    setGradient(center - spacing*(it+1), -recHeight, bar_thickness, 2*recHeight, c1, c2, Y_AXIS);
+  }
+
+  //setGradient(cx, cy, 540, 80, c2, c1, X_AXIS);
+  // Translate origin to center
+  //translate(width/2, height/2);
+  /*  
+   if ((s >= (PI/2)-atan(recHeight/recWidth))&(s <= PI/2+atan(recHeight/recWidth))||(s >= (3*PI/2)-(atan(recHeight/recWidth)))&(s <= (3*PI/2)+atan(recHeight/recWidth))){
+   rectMode(CORNER);
+   pushMatrix();
+   rotate(s);
+   setGradient(-25,-(recWidth/2)/cos(PI/2-s),50,recWidth/cos(PI/2-s),c1,c2,Y_AXIS);
+   popMatrix();
+   }
+   
+   if ((s >= 0)&&(s <= PI/2-atan(recHeight/recWidth))||(s > (3*PI/2)+(atan(recHeight/recWidth)))&&(s <= 2*PI)||(s > PI/2+atan(recHeight/recWidth))&&(s < (3*PI/2)-atan(recHeight/recWidth))){
+   rectMode(CORNER);
+   pushMatrix();
+   rotate(s);
+   setGradient(-25,-(recHeight/2)/sin(PI/2-s),50,recHeight/sin(PI/2-s),c1,c2,Y_AXIS);
+   popMatrix();
+   }*/
+}
+
+void setGradient(int x, float y, int w, float h, color c1, color c2, int axis ) {
+
+  noFill();
+
+  if (axis == Y_AXIS) {  // top to bottom gradient
+    for (float i = y; i <= y+h; i++) {
+      float inter = map(i, y, y+h, 0, 1);
+      color c = lerpColor(c1, c2, inter);
+      stroke(c);
+      strokeCap(SQUARE);
+      strokeWeight(10);
+      line(x, i, x+w, i);
+    }
+    for (float i = y; i >= y+h; i--) {
+      float inter = map(i, y, y+h, 0, 1);
+      color c = lerpColor(c2, c1, inter);
+      stroke(c);
+      strokeCap(SQUARE);
+      strokeWeight(10);
+      line(x, i, x+w, i);
+    }
+  }
+}
